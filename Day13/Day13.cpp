@@ -5,6 +5,7 @@
 #include "../Helpful_Commands.cpp"
 #include <unordered_map>
 #include <deque>
+#include <cmath>
 using namespace std;
 typedef long long ll;
 
@@ -95,79 +96,41 @@ void part1()
     cout << total << endl;
 }
 
-struct longNode
-{
-    ll x;
-    ll y;
-    ll aPresses;
-    ll bPresses;
-};
-deque<longNode> longSearchQueue;
 vector<ll> longTarget;
 
-void processLongNode(longNode currNode)
+ll getTicketsRequiredCramer()
 {
-    longNode aNode;
-    aNode.x = currNode.x + buttonA[0];
-    aNode.y = currNode.y + buttonA[1];
-    if(aNode.x <= target[0] && aNode.y <= target[1])
-    {
-        aNode.aPresses = currNode.aPresses+1;
-        aNode.bPresses = currNode.bPresses;
-        longSearchQueue.push_front(aNode);
-    }
-    
-    longNode bNode;
-    bNode.x = currNode.x + buttonB[0];
-    bNode.y = currNode.y + buttonB[1];
-    if(bNode.x <= target[0] && bNode.y <= target[1])
-    {
-        bNode.aPresses = currNode.aPresses;
-        bNode.bPresses = currNode.bPresses+1;
-        longSearchQueue.push_front(bNode);
-    }
-}
-
-ll getTicketsLongRequire(vector<ll>&longTarget)
-{
-    while(longSearchQueue.size() > 0)longSearchQueue.pop_back();
-    longNode startNode;
-    startNode.x = 0;
-    startNode.y = 0;
-    startNode.aPresses = 0;
-    startNode.bPresses = 0;
-    longSearchQueue.push_front(startNode);
-    while(longSearchQueue.size()>0)
-    {
-        longNode nextNode = longSearchQueue.front();
-        longSearchQueue.pop_front();
-        if(nextNode.x == target[0] && nextNode.y == target[1]){
-            cout << "x";
-            return nextNode.aPresses * 3 + nextNode.bPresses;}
-        processLongNode(nextNode);
-    }
-    return 0;
+    ll c1 = longTarget[0];
+    ll c2 = longTarget[1];
+    ll a1 = buttonA[0];
+    ll a2 = buttonA[1];
+    ll b1 = buttonB[0];
+    ll b2 = buttonB[1];
+    double x = double(double(c1*b2) - double(b1*c2))/double(double(a1*b2)-double(b1*a2));
+    double y = double(double(c2*a1) - double(a2*c1))/double(double(a1*b2)-double(b1*a2));
+    if(round(x) != x)return 0;
+    if(round(y) !=y) return 0;
+    return ll(x) * 3 + ll(y);
 }
 
 void part2()
 {
-    vector<string> lines = readInput();
-    int total = 0;
+   vector<string> lines = readInput();
+    ll total = 0;
     for(int i = 2; i < lines.size();i+=4){
         buttonA = stripNumsInt(lines[i-2]);
         buttonB = stripNumsInt(lines[i-1]);
         longTarget = stripNumsLong(lines[i]);
-        longTarget[0] +=  10000000000000;
-        longTarget[1] +=  10000000000000;
-
-        total += getTicketsLongRequire(longTarget);
+        longTarget[0] += 10000000000000;
+        longTarget[1] += 10000000000000;
+        total += getTicketsRequiredCramer();
     }
-    cout << total;
+    cout << total << endl;
 }
 
 int main()
 {
-    part1();
+    //part1();
     part2();
     return 0;
 }
